@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JSSDKDemo</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="//sqimg.qq.com/expert_qq/wawaji/1.2/TXWawaVideo.min.js"></script>
+    <script src="//sqimg.qq.com/expert_qq/webrtc/1.2/WebRTCAPI.min.js"></script>
+    <script src="//cdn.bootcss.com/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
+    <script src="http://cdn.wowgotcha.com/sdk/html5/panda-wawaji-3.0.0.min.js"></script>
+    <style type="text/css">
+        * {
+            -webkit-touch-callout: none;
+            -moz-touch-callout: none;
+            -ms-touch-callout: none;
+            touch-callout: none;
+        }
+        #placeholder{
+            width: 240px;
+            height: 320px;
+            background-color: lightgray;
+        }
+        .operation{
+            margin-top: 10px;
+        }
+        .control {
+            margin: 10px 0;
+        }
+        .operation-btn{
+            width: 60px;
+            height: 32px;
+            border: 1px solid #ccc;
+        }
+        .direction-btn{
+            width: 60px; height: 32px;
+            background-color: lightgray;
+            border: 1px solid #ccc;
+        }
+        .result{
+            margin-top: 20px;
+        }
+        .tips{
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body style="-webkit-user-select: none;">
+    <!-- 占位元素 -->
+    <div id="placeholder" style="width: 240px;height: 320px;background-color: lightgray;"></div>
+    <div class="operation">
+        <button class="operation-btn queue">排队</button>
+        <button class="operation-btn start-game">开始</button>
+        <button class="operation-btn switch-camera">切换</button>
+        <button class="operation-btn grap">下爪</button>
+    </div>
+    <div class="control">
+        <button class="direction-btn up">上</button>
+        <button class="direction-btn down">下</button>
+        <button class="direction-btn left">左</button>
+        <button class="direction-btn right">右</button>
+    </div>
+    <div class="result">
+        <button class="operation-btn cancle-queue">取消</button>
+        <button class="operation-btn start-game">再来</button>
+    </div>
+    <p class="tips">点击排队，预约游戏</p>
+
+    <script type="text/javascript">
+    $(function(){
+        let videoListener = {
+            onFailure: function(code, errmsg, err) {
+                console.error(code, errmsg);
+            },
+            onNeedVideoSig: function(sigCallback) {
+                sigCallback('5911d3c8e16b702b7e79a8298990c0fe914e9520d6328d61');
+            },
+            onJsmpegInfo: function(info) {
+            },
+            onFrontVideoPlay: function(delay) {
+                console.log(delay, '视频播放');
+                // 视频开始播放监听，如果hightQuality参数配置为false,对应的观众会接收到HightDelay的回调，玩家是LowDelay的回调
+                if (delay === PDWaWaJi.VideoPlayListener.LowDelay) {
+                    // 连麦视频播放
+                } else if (delay === PDWaWaJi.VideoPlayListener.HightDelay) {
+                    // 旁路视频播放
+                }
+            },
+            onSideVideoPlay: function(delay) {}
+        };
+        let playerListener = {
+            onGameWebsocketConnected: function() {
+                console.log('game websocket connected');
+            },
+            onGameWebsocketClose: function() {
+                console.log('game websocket closed');
+            },
+            onGameWebsocketError: function() {
+                console.error('game websocket error close');
+            },
+            onGameError: function(code, errmsg, err) {
+                // 游戏异常
+                console.error('game error');
+            },
+            onGameRoomReady: function(gameTime) {
+                // ws 连接成功，房间处于准备状态，加入排队队列
+                PDWaWaJi.Player.startQueue();
+            },
+            onGamePrepared: function(leftTime) {
+                console.log('开始游戏等待时长' + leftTime);
+                $('.tips').text('开始游戏等待时长' + leftTime + '，点击开始')
+            },
+            onGameWaitRestart: function(leftTime) {
+                console.log('等待重新开始倒计时' + leftTime);
+                $('.tips').text('等待重新开始倒计时' + leftTime + '，取消或再来')
+            },
+            onGameQueueKickOff: function() {
+                console.log('排队结束或等待重新开始结束，踢出队列');
+                $('.tips').text('已退出队列，可以重新开始排队')
+            },
+            onGameQueueUp: function() {
+                console.log('排队成功');
+            },
+            onGameQueueCancle: function() {
+                console.log('取消排队成功');
+                $('.tips').text('已取消，可以重新排队')
+            },
+            onRoomQueueInfo: function(queueInfo, position) {
+                console.log('队列信息' + JSON.stringify(queueInfo));
+                console.log('用户当前队列' + position);
+                // 配置hightQuality为false时，业务上可以在这里指定排队的前多少位可以提前连麦，加载低延时视频
+                if (position < 2) {
+                    PDWaWaJi.Video.upToVideoMember(function() {
+                        console.log('排队前列连麦成功');
+                    })
+                }
+            },
+            onGameStarted: function(sessionId) {
+                // 游戏开始
+                $('.tips').text('游戏已开始')
+            },
+            onGameReconnect: function(reconnectInfo) {
+                console.log('游戏重连成功，剩余时间' + reconnectInfo.time);
+            },
+            onGameResult: function(success) {
+                console.log('游戏结果' + success);
+            }
+        }
+        PDWaWaJi.init({
+            container_id: 'placeholder',
+            hightQuality: true,
+            enqueue: true,
+            sdkAppId: '***********',
+            accountType: '***********',
+            userId: 55,
+            userSig: "eJxlz19PgzAUBfB3PgXpq8a0tAU12QMuM6DTbINsiy*kjKJXtPxZBxvG7*7EJTbZff2dk5P7Zdm2jeJpdCU2m3KndKIPlUT2rY0wuvzHqoIsETqhTXaGcl9BIxORa9kMSDjnDsZmBjKpNORwSnBu2DYrkmHgr8yOTY69G2pG4HXAp8l8HI7T62A9FZEudu*wiPILt*7CNXsTfNXzSee-3N0v9jPSkpr54D9WaR26wfJDpLM6I1TQ-rlj4CnVx37f*jqI8bJQ*UM5H42MSQ2f8vSNQ13CCfMMbWWzhVINAQcf1aH495D1bf0AgmNb8w__",
+            jsmpegRenderType: 0,
+            room: {
+                roomId: 500139,
+                frontId: 'wowgotcha_500139_1',
+                sideId: 'wowgotcha_500139_2',
+                frontLive: 'http://15814.liveplay.myqcloud.com/live/15814_8985b20c42e3bf0a5e30330158febabd.m3u8',
+                sideLive: 'http://15814.liveplay.myqcloud.com/live/15814_c1e71d8fe70e5733538879ed715e81c0.m3u8'
+            },
+            videoListener: videoListener,
+            playerListener: playerListener
+        });
+        PDWaWaJi.enableLog()
+
+        //----------- 游戏操作
+        // 切换摄像头
+        $('.switch-camera').click(function(){
+            PDWaWaJi.Video.switchCamera();
+        })
+        // 排队
+        $('.queue').click(function(){
+            let wsUrl = "ws://wo.t.seafarer.me:9090/play/661558e06a53639d357b8399fb84648d73b1a762";
+            PDWaWaJi.Player.connectWS(wsUrl)
+        })
+        // 排队完成，开始游戏
+        $('.start-game').click(function(){
+            PDWaWaJi.Player.startGame();
+        })
+        // 下抓
+        $('.grap').click(function(){
+            PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.CATCH);
+        })
+        // 取消排队
+        $('.cancle-queue').click(function(){
+            PDWaWaJi.Player.cancleQueue();
+        })
+        // 方向键操作
+        $('.direction-btn').on('touchstart',function(e) {
+            if ($(this).hasClass('up')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.UP_START)
+            } else if ($(this).hasClass('down')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.DOWN_START)
+            } else if ($(this).hasClass('left')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.LEFT_START)
+            } else if ($(this).hasClass('right')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.RIGHT_START)
+            }
+        });
+        $('.direction-btn').on('touchend',function(e) {
+            if ($(this).hasClass('up')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.UP_END)
+            } else if ($(this).hasClass('down')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.DOWN_END)
+            } else if ($(this).hasClass('left')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.LEFT_END)
+            } else if ($(this).hasClass('right')) {
+                PDWaWaJi.Player.sendControl(PDWaWaJi.Operation.RIGHT_END)
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>
