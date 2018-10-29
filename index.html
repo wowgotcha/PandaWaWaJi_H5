@@ -14,10 +14,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <script src="jquery-3.2.1.min.js"></script>
-    <script src="//sqimg.qq.com/expert_qq/wawaji/1.2/TXWawaVideo.min.js"></script>
+    <script src="//sqimg.qq.com/expert_qq/wawaji/1.5/TXWawaVideo.min.js"></script>
     <script src="//sqimg.qq.com/expert_qq/webrtc/1.2/WebRTCAPI.min.js"></script>
     <script src="//cdn.bootcss.com/reconnecting-websocket/1.0.0/reconnecting-websocket.min.js"></script>
-    <script src="http://cdn.wowgotcha.com/sdk/html5/panda-wawaji-3.0.2.min.js"></script>
+    <script src="http://cdn.wowgotcha.com/sdk/html5/panda-wawaji-3.0.5.min.js"></script>
     <style type="text/css">
         * {
             -webkit-touch-callout: none;
@@ -83,7 +83,7 @@
                 console.error(code, errmsg);
             },
             onNeedVideoSig: function(sigCallback) {
-                sigCallback('5911d3c8e16b702b7e79a8298990c0fe914e9520d6328d61');
+                sigCallback('82ecd6e7c8bf3affd629eba81ca5994abb5514a316b6d64b');
             },
             onJsmpegInfo: function(info) {
             },
@@ -159,18 +159,18 @@
         PDWaWaJi.init({
             container_id: 'placeholder',
             hightQuality: true,
-            enqueue: true,
-            sdkAppId: '***********',
-            accountType: '***********',
-            userId: 55,
-            userSig: "eJxlz19PgzAUBfB3PgXpq8a0tAU12QMuM6DTbINsiy*kjKJXtPxZBxvG7*7EJTbZff2dk5P7Zdm2jeJpdCU2m3KndKIPlUT2rY0wuvzHqoIsETqhTXaGcl9BIxORa9kMSDjnDsZmBjKpNORwSnBu2DYrkmHgr8yOTY69G2pG4HXAp8l8HI7T62A9FZEudu*wiPILt*7CNXsTfNXzSee-3N0v9jPSkpr54D9WaR26wfJDpLM6I1TQ-rlj4CnVx37f*jqI8bJQ*UM5H42MSQ2f8vSNQ13CCfMMbWWzhVINAQcf1aH495D1bf0AgmNb8w__",
+            enqueue: false,
+            sdkAppId: '******',
+            accountType: '******',
+            userId: 'test',
+            userSig: "eJxlz0FPwjAUwPH7PsXSq0bbtcXNGzqRihC1GIaXZtACHW6rXRlbjN-dOElc4rv*-i8v79PzfR-MH-lFul6Xh8IJ1xoF-GsfQHD*h8ZoKVInsJX-UDVGWyXSjVO2Q0QpDSDsN1qqwumNPhVOVa6nldyL7sTvOoEQ4YiEqJ-obYfTu*Ute46NnUHFDM6SJBgf3hXi28WiXE3iOud1dDnJeZHPg71LPo5sN3xa2sFrtbL3jjcjdhzHL*RMj97ITfZAW0baNhtG1a6ZMsl6J53O1ekfPLgiYRTSntbKVrosuiCAiKIAw58B3pf3DTWOXeE_",
             jsmpegRenderType: 0,
             room: {
-                roomId: 500139,
-                frontId: 'wowgotcha_500139_1',
-                sideId: 'wowgotcha_500139_2',
-                frontLive: 'http://15814.liveplay.myqcloud.com/live/15814_8985b20c42e3bf0a5e30330158febabd.m3u8',
-                sideLive: 'http://15814.liveplay.myqcloud.com/live/15814_c1e71d8fe70e5733538879ed715e81c0.m3u8'
+                roomId: 500847,
+                frontId: 'wowgotcha_500847_1',
+                sideId: 'wowgotcha_500847_2',
+                //frontLive: 'http://15814.liveplay.myqcloud.com/live/15814_8985b20c42e3bf0a5e30330158febabd.m3u8',
+                //sideLive: 'http://15814.liveplay.myqcloud.com/live/15814_c1e71d8fe70e5733538879ed715e81c0.m3u8'
             },
             coverPic:{
                 front: '',
@@ -188,7 +188,7 @@
         })
         // 排队
         $('.queue').click(function(){
-            let wsUrl = "ws://wo.t.seafarer.me:9090/play/661558e06a53639d357b8399fb84648d73b1a762";
+            let wsUrl = "ws://ws1.open.wowgotcha.com:9090/play/5c29ab1a6b8d276b8e60f9f3fe22b96746364488";
             PDWaWaJi.Player.connectWS(wsUrl)
         })
         // 排队完成，开始游戏
